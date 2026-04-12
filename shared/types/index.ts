@@ -79,3 +79,6 @@ export type UpdateRoadmapInput = Partial<CreateRoadmapInput>
 
 export type CreateDelegationInput = Omit<Delegation, 'id' | 'status' | 'created_at' | 'resolved_at'>
 export type UpdateDelegationInput = Partial<{ status: string }>
+
+export type CreateMilestoneInput = Omit<Milestone, 'id'>
+export type UpdateMilestoneInput = Partial<CreateMilestoneInput>

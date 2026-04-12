@@ -6,9 +6,10 @@ import { AgentCard } from '@/components/AgentCard'
 import { AgentForm } from '@/components/AgentForm'
 import { OrgChart } from '@/components/OrgChart'
 import { DelegationForm, DelegationCard } from '@/components/DelegationForm'
+import { DelegationHistory } from '@/components/DelegationHistory'
 import { useDelegations } from '@/hooks/useDelegations'
-import { Plus, Search, List, GitBranch, Users } from 'lucide-react'
-import type { Agent } from '../../../../shared/types'
+import { Plus, Search, List, GitBranch, Users, History } from 'lucide-react'
+import type { Agent, Delegation } from '../../../shared/types'
 
 export function AgentsPage() {
   const { agents, createAgent, updateAgent, deleteAgent, isLoading } = useAgents()
@@ -20,7 +21,7 @@ export function AgentsPage() {
   const [search, setSearch] = useState('')
   const [filterRole, setFilterRole] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [viewMode, setViewMode] = useState<'list' | 'org' | 'delegations'>('list')
+  const [viewMode, setViewMode] = useState<'list' | 'org' | 'delegations' | 'history'>('list')
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
 
   const filteredAgents = agents?.filter((agent) => {
@@ -29,7 +30,7 @@ export function AgentsPage() {
     return matchesSearch && matchesRole
   })
 
-  const pendingDelegations = delegations?.filter(d => d.status === 'pending') || []
+  const pendingDelegations = delegations?.filter((d: Delegation) => d.status === 'pending') || []
 
   return (
     <div className="space-y-6">
@@ -61,6 +62,13 @@ export function AgentsPage() {
                 {pendingDelegations.length}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => setViewMode('history')}
+            className={`flex items-center gap-2 px-3 py-2 rounded-md ${viewMode === 'history' ? 'bg-secondary' : ''}`}
+          >
+            <History className="w-4 h-4" />
+            History
           </button>
         </div>
       </div>
@@ -142,7 +150,7 @@ export function AgentsPage() {
             <div className="text-center py-8 text-muted-foreground">No delegations yet</div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {delegations?.map((delegation) => (
+              {delegations?.map((delegation: Delegation) => (
                 <DelegationCard
                   key={delegation.id}
                   delegation={delegation}
@@ -154,6 +162,17 @@ export function AgentsPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {viewMode === 'history' && (
+        <div className="border rounded-lg p-6">
+          <h2 className="text-lg font-semibold mb-4">Delegation History</h2>
+          <DelegationHistory 
+            delegations={delegations || []} 
+            agents={agents || []} 
+            tickets={tickets || []} 
+          />
         </div>
       )}
 

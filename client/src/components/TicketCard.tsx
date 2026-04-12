@@ -1,5 +1,5 @@
-import { Calendar, User, Tag, ChevronRight } from 'lucide-react'
-import type { Ticket, Agent } from '../../../../shared/types'
+import { Calendar, User, ChevronRight } from 'lucide-react'
+import type { Ticket, Agent } from '../../../shared/types'
 
 interface TicketCardProps {
   ticket: Ticket

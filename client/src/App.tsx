@@ -4,6 +4,7 @@ import { AgentsPage } from './pages/AgentsPage'
 import { TicketsPage } from './pages/TicketsPage'
 import { RoadmapsPage } from './pages/RoadmapsPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { SettingsPage } from './pages/SettingsPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/agents" element={<AgentsPage />} />
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/roadmaps" element={<RoadmapsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
       </Layout>
     </BrowserRouter>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import type { Roadmap, CreateRoadmapInput } from '../../../../shared/types'
+import type { Roadmap, CreateRoadmapInput } from '../../../shared/types'
 
 interface RoadmapFormProps {
   roadmap?: Roadmap
@@ -13,7 +13,7 @@ export function RoadmapForm({ roadmap, onSubmit, onClose }: RoadmapFormProps) {
   const [description, setDescription] = useState(roadmap?.description || '')
   const [start_date, setStartDate] = useState(roadmap?.start_date?.split('T')[0] || '')
   const [end_date, setEndDate] = useState(roadmap?.end_date?.split('T')[0] || '')
-  const [status, setStatus] = useState(roadmap?.status || 'draft')
+  const [status, setStatus] = useState<Roadmap['status']>(roadmap?.status || 'draft')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,7 +91,7 @@ export function RoadmapForm({ roadmap, onSubmit, onClose }: RoadmapFormProps) {
             <label className="block text-sm font-medium mb-1">Status</label>
             <select
               value={status}
-              onChange={(e) => setStatus(e.target.value)}
+              onChange={(e) => setStatus(e.target.value as Roadmap['status'])}
               className="w-full px-3 py-2 border rounded-md"
             >
               <option value="draft">Draft</option>

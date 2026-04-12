@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import type { Ticket, Agent, CreateTicketInput } from '../../../../shared/types'
+import type { Ticket, Agent, CreateTicketInput } from '../../../shared/types'
 
 interface TicketFormProps {
   ticket?: Ticket
@@ -13,8 +13,8 @@ interface TicketFormProps {
 export function TicketForm({ ticket, agents, tickets, onSubmit, onClose }: TicketFormProps) {
   const [title, setTitle] = useState(ticket?.title || '')
   const [description, setDescription] = useState(ticket?.description || '')
-  const [priority, setPriority] = useState(ticket?.priority || 'P3')
-  const [status, setStatus] = useState(ticket?.status || 'open')
+  const [priority, setPriority] = useState<Ticket['priority']>(ticket?.priority || 'P3')
+  const [status, setStatus] = useState<Ticket['status']>(ticket?.status || 'open')
   const [assignee_id, setAssigneeId] = useState(ticket?.assignee_id || '')
   const [parent_ticket_id, setParentTicketId] = useState(ticket?.parent_ticket_id || '')
   const [due_date, setDueDate] = useState(ticket?.due_date?.split('T')[0] || '')
@@ -80,7 +80,7 @@ export function TicketForm({ ticket, agents, tickets, onSubmit, onClose }: Ticke
               <label className="block text-sm font-medium mb-1">Priority</label>
               <select
                 value={priority}
-                onChange={(e) => setPriority(e.target.value)}
+                onChange={(e) => setPriority(e.target.value as Ticket['priority'])}
                 className="w-full px-3 py-2 border rounded-md"
               >
                 <option value="P1">P1 - Critical</option>
@@ -94,7 +94,7 @@ export function TicketForm({ ticket, agents, tickets, onSubmit, onClose }: Ticke
               <label className="block text-sm font-medium mb-1">Status</label>
               <select
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setStatus(e.target.value as Ticket['status'])}
                 className="w-full px-3 py-2 border rounded-md"
               >
                 <option value="open">Open</option>

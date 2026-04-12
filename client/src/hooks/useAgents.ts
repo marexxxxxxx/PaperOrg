@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Agent, AgentRole, CreateAgentInput, UpdateAgentInput } from '../../../../shared/types'
+import type { Agent, AgentRole, CreateAgentInput, UpdateAgentInput } from '../../../shared/types'
 
 const API = '/api'
 

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Roadmap, CreateRoadmapInput, UpdateRoadmapInput } from '../../../../shared/types'
+import type { Roadmap, CreateRoadmapInput, UpdateRoadmapInput } from '../../../shared/types'
 
 const API = '/api'
 

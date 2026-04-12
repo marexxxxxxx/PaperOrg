@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { Ticket, CreateTicketInput, UpdateTicketInput } from '../../../../shared/types'
+import type { Ticket, CreateTicketInput, UpdateTicketInput } from '../../../shared/types'
 
 const API = '/api'
 

@@ -4,6 +4,74 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const ticketsRouter = Router()
 
+ticketsRouter.post('/auto-assign', (req, res) => {
+  const { ticket_id, priority } = req.body
+  const db = getDb()
+  
+  const ticketStmt = db.prepare('SELECT * FROM tickets WHERE id = ?')
+  ticketStmt.bind([ticket_id])
+  if (!ticketStmt.step()) {
+    ticketStmt.free()
+    return res.status(404).json({ error: 'Ticket not found' })
+  }
+  ticketStmt.free()
+
+  const agentsResult = db.exec(`
+    SELECT a.*, r.tier, r.name as role_name
+    FROM agents a
+    LEFT JOIN roles r ON a.role_id = r.id
+    WHERE a.status = 'active'
+    ORDER BY r.tier DESC
+  `)
+  
+  if (!agentsResult[0] || agentsResult[0].values.length === 0) {
+    return res.status(400).json({ error: 'No active agents available' })
+  }
+
+  const agents = agentsResult[0].values.map(row => ({
+    id: String(row[0]),
+    name: String(row[1]),
+    role_id: row[2] ? String(row[2]) : null,
+    tier: row[11] ? Number(row[11]) : 0
+  }))
+
+  const ticketCountStmt = db.prepare(`
+    SELECT assignee_id, COUNT(*) as count 
+    FROM tickets 
+    WHERE status IN ('open', 'in_progress') 
+    GROUP BY assignee_id
+  `)
+  
+  const workload: Record<string, number> = {}
+  while (ticketCountStmt.step()) {
+    const row = ticketCountStmt.getAsObject()
+    if (row.assignee_id) {
+      workload[row.assignee_id as string] = row.count as number
+    }
+  }
+  ticketCountStmt.free()
+
+  let bestAgent = agents[0]
+  let minWorkload = workload[bestAgent.id] || 0
+  
+  for (const agent of agents) {
+    const agentWorkload = workload[agent.id] || 0
+    if (agentWorkload < minWorkload) {
+      minWorkload = agentWorkload
+      bestAgent = agent
+    }
+  }
+
+  db.run('UPDATE tickets SET assignee_id = ? WHERE id = ?', [bestAgent.id, ticket_id])
+  saveDb()
+  
+  res.json({ 
+    success: true, 
+    assigned_to: bestAgent.id,
+    agent_name: bestAgent.name 
+  })
+})
+
 ticketsRouter.get('/', (req, res) => {
   const db = getDb()
   const result = db.exec(`

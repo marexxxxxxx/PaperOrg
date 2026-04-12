@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X } from 'lucide-react'
-import type { Agent, AgentRole, CreateAgentInput } from '../../../../shared/types'
+import type { Agent, AgentRole, CreateAgentInput } from '../../../shared/types'
 
 interface AgentFormProps {
   agent?: Agent

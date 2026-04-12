@@ -1,5 +1,5 @@
 import { Pencil, Trash2, User } from 'lucide-react'
-import type { Agent, AgentRole } from '../../../../shared/types'
+import type { Agent, AgentRole } from '../../../shared/types'
 
 interface AgentCardProps {
   agent: Agent

@@ -1,10 +1,10 @@
-import { Pencil, Trash2, Calendar, Flag } from 'lucide-react'
-import type { Roadmap } from '../../../../shared/types'
+import { Pencil, Trash2, Calendar } from 'lucide-react'
+import type { Roadmap } from '../../../shared/types'
 
 interface RoadmapCardProps {
   roadmap: Roadmap
-  onEdit: () => void
-  onDelete: () => void
+  onEdit: (e?: React.MouseEvent) => void
+  onDelete: (e?: React.MouseEvent) => void
 }
 
 const statusColors = {

@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, Users, Ticket, GitBranch } from 'lucide-react'
+import { LayoutDashboard, Users, Ticket, GitBranch, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -7,6 +7,7 @@ const navItems = [
   { to: '/agents', label: 'Agents', icon: Users },
   { to: '/tickets', label: 'Tickets', icon: Ticket },
   { to: '/roadmaps', label: 'Roadmaps', icon: GitBranch },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export function Layout({ children }: { children: React.ReactNode }) {

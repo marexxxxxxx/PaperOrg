@@ -7,6 +7,7 @@ import { ticketsRouter } from './routes/tickets.js'
 import { roadmapsRouter } from './routes/roadmaps.js'
 import { delegationsRouter } from './routes/delegations.js'
 import { aiRouter } from './routes/ai.js'
+import { milestonesRouter } from './routes/milestones.js'
 
 const app = express()
 const PORT = 3001
@@ -20,6 +21,7 @@ app.use('/api/tickets', ticketsRouter)
 app.use('/api/roadmaps', roadmapsRouter)
 app.use('/api/delegations', delegationsRouter)
 app.use('/api/ai', aiRouter)
+app.use('/api/milestones', milestonesRouter)
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' })

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Search, Filter } from 'lucide-react'
+import { Plus, Search, Filter, Zap } from 'lucide-react'
 import { useTickets } from '@/hooks/useTickets'
 import { TicketCard } from '@/components/TicketCard'
 import { TicketForm } from '@/components/TicketForm'
@@ -11,6 +11,28 @@ export function TicketsPage() {
   const [filterStatus, setFilterStatus] = useState('')
   const [filterPriority, setFilterPriority] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [autoAssignId, setAutoAssignId] = useState<string | null>(null)
+
+  const handleAutoAssign = async (ticketId: string) => {
+    setAutoAssignId(ticketId)
+    try {
+      const res = await fetch('/api/tickets/auto-assign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticket_id: ticketId })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        alert(`Auto-assigned to ${data.agent_name}`)
+        window.location.reload()
+      } else {
+        const err = await res.json()
+        alert(err.error || 'Failed to auto-assign')
+      }
+    } finally {
+      setAutoAssignId(null)
+    }
+  }
 
   const filteredTickets = tickets?.filter((ticket) => {
     const matchesSearch = ticket.title.toLowerCase().includes(search.toLowerCase())
@@ -73,13 +95,25 @@ export function TicketsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTickets?.map((ticket) => (
-            <TicketCard
-              key={ticket.id}
-              ticket={ticket}
-              assignee={agents?.find((a) => a.id === ticket.assignee_id)}
-              onEdit={() => setEditingId(ticket.id)}
-              onStatusChange={(status) => updateTicket(ticket.id, { status })}
-            />
+            <div key={ticket.id} className="relative">
+              {!ticket.assignee_id && (
+                <button
+                  onClick={() => handleAutoAssign(ticket.id)}
+                  disabled={autoAssignId === ticket.id}
+                  className="absolute top-2 right-2 p-1.5 bg-purple-100 text-purple-600 rounded-md hover:bg-purple-200 text-xs flex items-center gap-1 z-10"
+                  title="Auto-assign to available agent"
+                >
+                  <Zap className="w-3 h-3" />
+                  {autoAssignId === ticket.id ? '...' : 'Auto'}
+                </button>
+              )}
+              <TicketCard
+                ticket={ticket}
+                assignee={agents?.find((a) => a.id === ticket.assignee_id)}
+                onEdit={() => setEditingId(ticket.id)}
+                onStatusChange={(status) => updateTicket(ticket.id, { status })}
+              />
+            </div>
           ))}
         </div>
       )}
