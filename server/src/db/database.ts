@@ -34,6 +34,16 @@ export async function initDatabase() {
   `)
 
   db.run(`
+    CREATE TABLE IF NOT EXISTS departments (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT NOT NULL DEFAULT '',
+      created_at TEXT NOT NULL
+    )
+  `)
+
+  // Add department_id and api_key columns if they don't exist
+  db.run(`
     CREATE TABLE IF NOT EXISTS agents (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -44,9 +54,15 @@ export async function initDatabase() {
       avatar_url TEXT,
       description TEXT,
       created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
+      updated_at TEXT NOT NULL,
+      department_id TEXT,
+      api_key TEXT UNIQUE
     )
   `)
+
+  // Try to add the columns to existing agents table just in case they are missing
+  try { db.run("ALTER TABLE agents ADD COLUMN department_id TEXT"); } catch (e) {}
+  try { db.run("ALTER TABLE agents ADD COLUMN api_key TEXT"); } catch (e) {}
 
   db.run(`
     CREATE TABLE IF NOT EXISTS tickets (
@@ -99,6 +115,26 @@ export async function initDatabase() {
       target_date TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'pending',
       ticket_ids TEXT NOT NULL DEFAULT '[]'
+    )
+  `)
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS ticket_comments (
+      id TEXT PRIMARY KEY,
+      ticket_id TEXT NOT NULL,
+      agent_id TEXT NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    )
+  `)
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS routing_rules (
+      id TEXT PRIMARY KEY,
+      source_department_id TEXT NOT NULL,
+      target_role_id TEXT,
+      target_department_id TEXT,
+      created_at TEXT NOT NULL
     )
   `)
 

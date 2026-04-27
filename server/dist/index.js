@@ -8,6 +8,9 @@ import { roadmapsRouter } from './routes/roadmaps.js';
 import { delegationsRouter } from './routes/delegations.js';
 import { aiRouter } from './routes/ai.js';
 import { milestonesRouter } from './routes/milestones.js';
+import { agentApiRouter } from './routes/agent-api.js';
+import { departmentsRouter } from './routes/departments.js';
+import { routingRulesRouter } from './routes/routing-rules.js';
 const app = express();
 const PORT = 3001;
 app.use(cors());
@@ -19,6 +22,10 @@ app.use('/api/roadmaps', roadmapsRouter);
 app.use('/api/delegations', delegationsRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/milestones', milestonesRouter);
+app.use('/api/departments', departmentsRouter);
+app.use('/api/routing-rules', routingRulesRouter);
+// New Lightweight Agent API
+app.use('/api/v1/agent', agentApiRouter);
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
