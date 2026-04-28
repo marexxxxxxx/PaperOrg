@@ -26,10 +26,23 @@ export function RoadmapsPage() {
 
   const getMilestoneProgress = useMemo(() => {
     if (!milestones || !tickets) return {}
+
+    const ticketMap = new Map(tickets.map(t => [t.id, t]))
+
     return milestones.reduce((acc, m) => {
-      const milestoneTickets = tickets.filter(t => m.ticket_ids.includes(t.id))
-      const completed = milestoneTickets.filter(t => t.status === 'closed' || t.status === 'resolved').length
-      const total = milestoneTickets.length
+      let completed = 0
+      let total = 0
+
+      for (const ticketId of m.ticket_ids) {
+        const t = ticketMap.get(ticketId)
+        if (t) {
+          total++
+          if (t.status === 'closed' || t.status === 'resolved') {
+            completed++
+          }
+        }
+      }
+
       acc[m.id] = total > 0 ? Math.round((completed / total) * 100) : 0
       return acc
     }, {} as Record<string, number>)
