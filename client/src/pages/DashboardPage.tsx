@@ -84,19 +84,40 @@ export function DashboardPage() {
 
   const agentWorkload = useMemo(() => {
     if (!agents || !tickets) return []
-    return agents.map(agent => {
-      const assignedTickets = tickets.filter(t => t.assignee_id === agent.id)
-      const activeTickets = assignedTickets.filter(t => t.status === 'open' || t.status === 'in_progress')
-      const completedTickets = assignedTickets.filter(t => t.status === 'resolved' || t.status === 'closed')
-      const role = roles?.find(r => r.id === agent.role_id)
-      return {
-        agent,
-        role,
-        total: assignedTickets.length,
-        active: activeTickets.length,
-        completed: completedTickets.length,
+
+    const roleMap = new Map()
+    if (roles) {
+      for (const r of roles) {
+        roleMap.set(r.id, r)
       }
-    }).filter(w => w.total > 0).sort((a, b) => b.active - a.active)
+    }
+
+    const workloadMap = new Map()
+    for (const t of tickets) {
+      if (!t.assignee_id) continue
+      let w = workloadMap.get(t.assignee_id)
+      if (!w) {
+        w = { total: 0, active: 0, completed: 0 }
+        workloadMap.set(t.assignee_id, w)
+      }
+      w.total++
+      if (t.status === 'open' || t.status === 'in_progress') w.active++
+      else if (t.status === 'resolved' || t.status === 'closed') w.completed++
+    }
+
+    return agents.reduce((acc, agent) => {
+      const workload = workloadMap.get(agent.id)
+      if (workload && workload.total > 0) {
+        acc.push({
+          agent,
+          role: roleMap.get(agent.role_id),
+          total: workload.total,
+          active: workload.active,
+          completed: workload.completed,
+        })
+      }
+      return acc
+    }, [] as any[]).sort((a: any, b: any) => b.active - a.active)
   }, [agents, tickets, roles])
 
   const burndownData = useMemo(() => {
