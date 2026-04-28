@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useAgents } from '@/hooks/useAgents'
 import { useRoles } from '@/hooks/useRoles'
 import { useTickets } from '@/hooks/useTickets'
@@ -9,7 +9,7 @@ import { DelegationForm, DelegationCard } from '@/components/DelegationForm'
 import { DelegationHistory } from '@/components/DelegationHistory'
 import { useDelegations } from '@/hooks/useDelegations'
 import { Plus, Search, List, GitBranch, Users, History } from 'lucide-react'
-import type { Agent, Delegation } from '../../../shared/types'
+import type { Agent, Delegation, AgentRole } from '../../../shared/types'
 
 export function AgentsPage() {
   const { agents, createAgent, updateAgent, deleteAgent, isLoading } = useAgents()
@@ -23,6 +23,14 @@ export function AgentsPage() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'list' | 'org' | 'delegations' | 'history'>('list')
   const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null)
+
+  const roleMap = useMemo(() => {
+    const map: Record<string, AgentRole> = {}
+    roles?.forEach((role) => {
+      map[role.id] = role
+    })
+    return map
+  }, [roles])
 
   const filteredAgents = agents?.filter((agent) => {
     const matchesSearch = agent.name.toLowerCase().includes(search.toLowerCase())
@@ -119,7 +127,7 @@ export function AgentsPage() {
                 <AgentCard
                   key={agent.id}
                   agent={agent}
-                  role={roles?.find((r) => r.id === agent.role_id)}
+                  role={roleMap[agent.role_id]}
                   onEdit={() => setEditingId(agent.id)}
                   onDelete={() => deleteAgent(agent.id)}
                 />
