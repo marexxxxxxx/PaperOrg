@@ -9,6 +9,31 @@ export interface Agent {
   description?: string
   created_at: string
   updated_at: string
+  department_id?: string | null
+  api_key?: string | null
+}
+
+export interface Department {
+  id: string
+  name: string
+  description: string
+  created_at: string
+}
+
+export interface TicketComment {
+  id: string
+  ticket_id: string
+  agent_id: string
+  content: string
+  created_at: string
+}
+
+export interface RoutingRule {
+  id: string
+  source_department_id: string
+  target_role_id: string | null
+  target_department_id: string | null
+  created_at: string
 }
 
 export interface AgentRole {
@@ -65,7 +90,7 @@ export interface Milestone {
   ticket_ids: string[]
 }
 
-export type CreateAgentInput = Omit<Agent, 'id' | 'created_at' | 'updated_at'>
+export type CreateAgentInput = Omit<Agent, 'id' | 'created_at' | 'updated_at' | 'api_key'>
 export type UpdateAgentInput = Partial<CreateAgentInput>
 
 export type CreateTicketInput = Omit<Ticket, 'id' | 'created_at' | 'updated_at'>
@@ -82,3 +107,11 @@ export type UpdateDelegationInput = Partial<{ status: string }>
 
 export type CreateMilestoneInput = Omit<Milestone, 'id'>
 export type UpdateMilestoneInput = Partial<CreateMilestoneInput>
+
+export type CreateDepartmentInput = Omit<Department, 'id' | 'created_at'>
+export type UpdateDepartmentInput = Partial<CreateDepartmentInput>
+
+export type CreateRoutingRuleInput = Omit<RoutingRule, 'id' | 'created_at'>
+export type UpdateRoutingRuleInput = Partial<CreateRoutingRuleInput>
+
+export type CreateTicketCommentInput = Omit<TicketComment, 'id' | 'created_at'>

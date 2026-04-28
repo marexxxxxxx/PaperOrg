@@ -1,13 +1,18 @@
 import { Router } from 'express'
 import { getDb, saveDb } from '../db/database.js'
 import { v4 as uuidv4 } from 'uuid'
+import crypto from 'crypto'
 
 export const agentsRouter = Router()
+
+function generateApiKey(): string {
+  return 'sk-' + crypto.randomBytes(32).toString('hex')
+}
 
 agentsRouter.get('/', (req, res) => {
   const db = getDb()
   const result = db.exec(`
-    SELECT id, name, role_id, parent_id, capabilities, status, avatar_url, description, created_at, updated_at
+    SELECT id, name, role_id, parent_id, capabilities, status, avatar_url, description, created_at, updated_at, department_id
     FROM agents ORDER BY created_at DESC
   `)
   
@@ -28,7 +33,7 @@ agentsRouter.get('/', (req, res) => {
 agentsRouter.get('/:id', (req, res) => {
   const db = getDb()
   const stmt = db.prepare(`
-    SELECT id, name, role_id, parent_id, capabilities, status, avatar_url, description, created_at, updated_at
+    SELECT id, name, role_id, parent_id, capabilities, status, avatar_url, description, created_at, updated_at, department_id
     FROM agents WHERE id = ?
  `)
   stmt.bind([req.params.id])
@@ -48,15 +53,16 @@ agentsRouter.get('/:id', (req, res) => {
 })
 
 agentsRouter.post('/', (req, res) => {
-  const { name, role_id, parent_id, status, capabilities, description, avatar_url } = req.body
+  const { name, role_id, parent_id, status, capabilities, description, avatar_url, department_id } = req.body
   const id = uuidv4()
   const now = new Date().toISOString()
+  const api_key = generateApiKey()
   
   const db = getDb()
   db.run(`
-    INSERT INTO agents (id, name, role_id, parent_id, capabilities, status, description, avatar_url, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `, [id, name, role_id || null, parent_id || null, JSON.stringify(capabilities || []), status || 'idle', description || null, avatar_url || null, now, now])
+    INSERT INTO agents (id, name, role_id, parent_id, capabilities, status, description, avatar_url, created_at, updated_at, department_id, api_key)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `, [id, name, role_id || null, parent_id || null, JSON.stringify(capabilities || []), status || 'idle', description || null, avatar_url || null, now, now, department_id || null, api_key])
   
   saveDb()
   
@@ -71,11 +77,13 @@ agentsRouter.post('/', (req, res) => {
     avatar_url,
     created_at: now,
     updated_at: now,
+    department_id: department_id || null,
+    api_key
   })
 })
 
 agentsRouter.patch('/:id', (req, res) => {
-  const { name, role_id, parent_id, status, capabilities, description, avatar_url } = req.body
+  const { name, role_id, parent_id, status, capabilities, description, avatar_url, department_id } = req.body
   const now = new Date().toISOString()
   
   const db = getDb()
@@ -95,6 +103,7 @@ agentsRouter.patch('/:id', (req, res) => {
   if (capabilities !== undefined) db.run('UPDATE agents SET capabilities = ? WHERE id = ?', [JSON.stringify(capabilities), req.params.id])
   if (description !== undefined) db.run('UPDATE agents SET description = ? WHERE id = ?', [description, req.params.id])
   if (avatar_url !== undefined) db.run('UPDATE agents SET avatar_url = ? WHERE id = ?', [avatar_url, req.params.id])
+  if (department_id !== undefined) db.run('UPDATE agents SET department_id = ? WHERE id = ?', [department_id || null, req.params.id])
   db.run('UPDATE agents SET updated_at = ? WHERE id = ?', [now, req.params.id])
   
   saveDb()
