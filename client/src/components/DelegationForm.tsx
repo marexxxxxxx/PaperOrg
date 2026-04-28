@@ -3,6 +3,7 @@ import { X, User, ArrowRight, MessageSquare, Check, XCircle } from 'lucide-react
 import { useAgents } from '@/hooks/useAgents'
 import { useTickets } from '@/hooks/useTickets'
 import { useDelegations } from '@/hooks/useDelegations'
+import type { Delegation, Agent, Ticket } from '../../../shared/types'
 
 interface DelegationFormProps {
   onClose: () => void
@@ -125,9 +126,9 @@ export function DelegationForm({ onClose }: DelegationFormProps) {
 }
 
 interface DelegationCardProps {
-  delegation: any
-  agents: any[]
-  tickets: any[]
+  delegation: Delegation
+  agents: Agent[]
+  tickets: Ticket[]
   onAccept: (id: string) => void
   onReject: (id: string) => void
 }
